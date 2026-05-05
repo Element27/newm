@@ -49,13 +49,13 @@ export function AIStylistView({
           rows={3}
         />
         
-        <div className="flex flex-wrap gap-2">
+        <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {SUGGESTION_PILLS.map((pill) => (
             <button
               key={pill.id}
               type="button"
               onClick={() => onPromptChange(pill.prompt)}
-              className="inline-flex items-center gap-2 rounded-full border border-border bg-white px-4 py-2 text-sm font-medium text-foreground transition hover:border-primary hover:bg-primary/5"
+              className="inline-flex shrink-0 items-center gap-2 rounded-full border border-border bg-white px-4 py-2 text-sm font-medium text-foreground transition hover:border-primary hover:bg-primary/5"
             >
               {pill.label}
             </button>

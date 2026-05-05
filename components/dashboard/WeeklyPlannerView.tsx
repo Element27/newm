@@ -176,22 +176,10 @@ function PlannerDayCard({
           >
             {occasionOptions.map((option) => (
               <option key={option} value={option}>
-                {option}
+                {option.charAt(0).toUpperCase() + option.slice(1)}
               </option>
             ))}
           </select>
-        </label>
-
-        <label className="space-y-2">
-          <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--muted)]">
-            Item IDs (comma-separated)
-          </span>
-          <input
-            value={itemIdsText}
-            onChange={(event) => setItemIdsText(event.target.value)}
-            className="w-full rounded-2xl border border-border bg-white px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary"
-            placeholder="id1, id2, id3"
-          />
         </label>
 
         <label className="space-y-2">
@@ -199,9 +187,9 @@ function PlannerDayCard({
           <textarea
             value={notes}
             onChange={(event) => setNotes(event.target.value)}
-            rows={3}
+            rows={2}
             className="w-full rounded-2xl border border-border bg-white px-4 py-3 text-sm text-foreground outline-none transition focus:border-primary"
-            placeholder="Any adjustment note for this day..."
+            placeholder="Any notes for this day..."
           />
         </label>
       </div>
@@ -212,10 +200,7 @@ function PlannerDayCard({
           void onSave(day.date, {
             occasion,
             notes,
-            itemIds: itemIdsText
-              .split(",")
-              .map((value) => value.trim())
-              .filter(Boolean),
+            itemIds: day.itemIds,
           })
         }
         disabled={isUpdating}

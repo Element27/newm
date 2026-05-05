@@ -122,6 +122,11 @@ export function DashboardClient() {
             (profile?.stylePreferences && profile.stylePreferences.length > 0
               ? `Style preferences: ${profile.stylePreferences.join(", ")}`
               : ""),
+          userProfile: {
+            primaryStyle: profile?.primaryStyle ?? null,
+            stylePreferences: profile?.stylePreferences ?? [],
+            size: profile?.size ?? null,
+          },
         }),
       });
       setRecommendations(data.items || []);
@@ -326,7 +331,7 @@ export function DashboardClient() {
       <button
         type="button"
         onClick={() => setUploadOpen(true)}
-        className="fixed bottom-32 right-5 z-50 flex h-18 w-18 items-center justify-center rounded-full bg-[color:var(--accent)] text-[color:var(--primary)] shadow-[0_24px_40px_rgba(95,69,35,0.2)] transition hover:scale-105 md:bottom-28 md:right-10"
+        className="fixed bottom-36 right-5 z-50 flex h-18 w-18 items-center justify-center rounded-full bg-[color:var(--accent)] text-[color:var(--primary)] shadow-[0_24px_40px_rgba(95,69,35,0.2)] transition hover:scale-105 md:bottom-32 md:right-10"
         aria-label="Add clothing item"
       >
         <FiPlus className="h-8 w-8" />
