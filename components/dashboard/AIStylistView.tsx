@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import { FiRefreshCw, FiStar, FiZap } from "react-icons/fi";
-import type { Occasion, WardrobeItem } from "@/lib/wardrobe";
+import { FiRefreshCw, FiZap } from "react-icons/fi";
+import type { WardrobeItem } from "@/lib/wardrobe";
+import { OutfitCard } from "./OutfitCard";
 
 const SUGGESTION_PILLS = [
   { id: "date-night", label: "✨ Date night", prompt: "A stylish and confident outfit for a date night in the city." },
@@ -112,29 +113,12 @@ export function AIStylistView({
       {!loading && recommendations.length > 0 && (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {recommendations.map((item) => (
-            <article key={item.id} className="overflow-hidden rounded-3xl border border-border bg-white shadow-sm">
-              <div className="aspect-[4/5] overflow-hidden bg-[color:var(--background)]">
-                <img
-                  src={getImageUrl(item)}
-                  alt={item.name}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              <div className="space-y-2 p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-foreground">{item.name}</p>
-                    <p className="mt-1 text-xs uppercase tracking-[0.18em] text-[color:var(--muted)]">
-                      {item.category}
-                    </p>
-                  </div>
-                  <span
-                    className="mt-1 inline-block h-4 w-4 shrink-0 rounded-full border border-white shadow"
-                    style={{ backgroundColor: item.colorHex }}
-                  />
-                </div>
-              </div>
-            </article>
+            <OutfitCard
+              key={item.id}
+              item={item}
+              imageUrl={getImageUrl(item)}
+              aspectRatio="4/5"
+            />
           ))}
         </div>
       )}

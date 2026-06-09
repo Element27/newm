@@ -2,6 +2,7 @@
 
 import React from "react";
 import type { WardrobeItem, WeeklyPlan, WeeklyPlanDay, Occasion } from "@/lib/wardrobe";
+import { OutfitCard } from "./OutfitCard";
 
 const occasionOptions: Occasion[] = ["work", "casual", "travel"];
 const weekdayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -120,12 +121,10 @@ function PlannerDayCard({
 }) {
   const [occasion, setOccasion] = React.useState<Occasion>(day.occasion);
   const [notes, setNotes] = React.useState(day.notes || "");
-  const [itemIdsText, setItemIdsText] = React.useState(day.itemIds.join(", "));
 
   React.useEffect(() => {
     setOccasion(day.occasion);
     setNotes(day.notes || "");
-    setItemIdsText(day.itemIds.join(", "));
   }, [day.date, day.itemIds, day.notes, day.occasion]);
 
   const resolvedItems = day.itemIds.map((id) => byId.get(id)).filter(Boolean) as WardrobeItem[];
@@ -154,15 +153,12 @@ function PlannerDayCard({
           </div>
         )}
         {resolvedItems.map((item) => (
-          <div key={item.id} className="overflow-hidden rounded-2xl border border-border bg-[color:var(--background)]">
-            <div className="aspect-square overflow-hidden">
-              <img src={getImageUrl(item)} alt={item.name} className="h-full w-full object-cover" />
-            </div>
-            <div className="space-y-1 p-3">
-              <p className="truncate text-sm font-semibold text-foreground">{item.name}</p>
-              <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--muted)]">{item.category}</p>
-            </div>
-          </div>
+          <OutfitCard
+            key={item.id}
+            item={item}
+            imageUrl={getImageUrl(item)}
+            aspectRatio="square"
+          />
         ))}
       </div>
 

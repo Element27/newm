@@ -43,6 +43,10 @@ export function DashboardClient() {
   const [previewItem, setPreviewItem] = React.useState<WardrobeItem | null>(null);
   const [deleteTarget, setDeleteTarget] = React.useState<WardrobeItem | null>(null);
   const [deleting, setDeleting] = React.useState(false);
+  const [dailySuggestion, setDailySuggestion] = React.useState<{
+    message: string;
+    weather: { city: string; temp: number; condition: string } | null;
+  } | null>(null);
 
   const userId = user?.id;
 
@@ -68,6 +72,18 @@ export function DashboardClient() {
     return nextPlan;
   }, [userId]);
 
+  const loadDailySuggestion = React.useCallback(async () => {
+    if (!userId) return;
+    try {
+      const data = await apiFetch("/recommend/daily");
+      if (data.message) {
+        setDailySuggestion({ message: data.message, weather: data.weather });
+      }
+    } catch (e) {
+      console.error("Failed to load daily suggestion", e);
+    }
+  }, [userId]);
+
   React.useEffect(() => {
     let active = true;
 
@@ -89,7 +105,7 @@ export function DashboardClient() {
           return;
         }
 
-        await Promise.all([loadItems(), loadWeeklyPlan()]);
+        await Promise.all([loadItems(), loadWeeklyPlan(), loadDailySuggestion()]);
       } finally {
         if (active) {
           setScreenLoading(false);
@@ -216,7 +232,7 @@ export function DashboardClient() {
       <div className="grid min-h-screen place-items-center">
         <div className="text-center">
           <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-border border-t-primary" />
-          <p className="mt-4 text-sm text-[color:var(--muted)]">Loading your wardrobe...</p>
+          <p className="mt-4 text-sm text-muted">Loading your wardrobe...</p>
         </div>
       </div>
     );
@@ -228,8 +244,8 @@ export function DashboardClient() {
   return (
     <>
       <div className="min-h-screen pb-40">
-        <header className="glass-strong sticky top-0 z-30 border-b border-[color:rgba(164,140,104,0.28)]">
-          <div className="mx-auto flex w-full max-w-[92rem] items-center justify-between gap-4 px-5 py-6 md:px-10">
+        <header className="glass-strong sticky top-0 z-30 border-b border-[rgba(164,140,104,0.28)]">
+          <div className="mx-auto flex w-full max-w-368 items-center justify-between gap-4 px-2 py-3 md:px-10">
             <button
               type="button"
               onClick={() => setTab("closet")}
@@ -238,13 +254,13 @@ export function DashboardClient() {
               Mura
             </button>
 
-            <nav className="hidden items-center gap-6 text-[1rem] text-[color:var(--muted)] md:flex">
+            <nav className="hidden items-center gap-6 text-[1rem] text-muted md:flex">
               <HeaderTab label="Closet" active={tab === "closet"} onClick={() => setTab("closet")} />
               <HeaderTab label="Planner" active={tab === "planner"} onClick={() => setTab("planner")} />
               <HeaderTab label="Stylist" active={tab === "stylist"} onClick={() => setTab("stylist")} />
               <button
                 type="button"
-                className="px-4 py-2 text-[color:var(--muted)] transition hover:text-foreground"
+                className="px-4 py-2 text-muted transition hover:text-foreground"
                 onClick={() => setTab("profile")}
               >
                 Trends
@@ -254,7 +270,7 @@ export function DashboardClient() {
             <button
               type="button"
               onClick={() => setTab("profile")}
-              className="flex h-14 w-14 items-center justify-center rounded-full bg-[color:var(--primary)] text-xl text-[#f4e5cb] shadow-md transition hover:scale-[1.02]"
+              className="flex h-10 w-10 lg:h-14 lg:w-14 items-center justify-center rounded-full bg-primary text-xl text-[#f4e5cb] shadow-md transition hover:scale-[1.02]"
               aria-label="Open profile"
             >
               {avatarLabel}
@@ -262,49 +278,50 @@ export function DashboardClient() {
           </div>
         </header>
 
-        <div className="mx-auto w-full max-w-[92rem] px-5 py-8 md:px-10 md:py-10">
-        {tab === "closet" && (
-          <ClosetView
-            items={items}
-            filter={filter}
-            onFilterChange={setFilter}
-            getImageUrl={getImageUrl}
-            onPreview={setPreviewItem}
-            onDelete={setDeleteTarget}
-            recommendations={recommendations}
-            onOpenStylist={() => setTab("stylist")}
-            onAddPiece={() => setUploadOpen(true)}
-          />
-        )}
+        <div className="mx-auto w-full max-w-368 px-5 py-8 md:px-10 md:py-10">
+          {tab === "closet" && (
+            <ClosetView
+              items={items}
+              filter={filter}
+              onFilterChange={setFilter}
+              getImageUrl={getImageUrl}
+              onPreview={setPreviewItem}
+              onDelete={setDeleteTarget}
+              recommendations={recommendations}
+              dailySuggestion={dailySuggestion}
+              onOpenStylist={() => setTab("stylist")}
+              onAddPiece={() => setUploadOpen(true)}
+            />
+          )}
 
-        {tab === "stylist" && (
-          <AIStylistView
-            prompt={stylistPrompt}
-            onPromptChange={setStylistPrompt}
-            onGenerate={generateRecommendations}
-            recommendations={recommendations}
-            loading={recommendationLoading}
-            getImageUrl={getImageUrl}
-          />
-        )}
+          {tab === "stylist" && (
+            <AIStylistView
+              prompt={stylistPrompt}
+              onPromptChange={setStylistPrompt}
+              onGenerate={generateRecommendations}
+              recommendations={recommendations}
+              loading={recommendationLoading}
+              getImageUrl={getImageUrl}
+            />
+          )}
 
-        {tab === "planner" && (
-          <WeeklyPlannerView
-            plan={plan}
-            items={items}
-            getImageUrl={getImageUrl}
-            generating={plannerGenerating}
-            regeneratingDate={regeneratingDayDate}
-            updatingDate={updatingDayDate}
-            onGenerateWeek={generateWeeklyPlan}
-            onRegenerateDay={regenerateDay}
-            onUpdateDay={updatePlanDay}
-          />
-        )}
+          {tab === "planner" && (
+            <WeeklyPlannerView
+              plan={plan}
+              items={items}
+              getImageUrl={getImageUrl}
+              generating={plannerGenerating}
+              regeneratingDate={regeneratingDayDate}
+              updatingDate={updatingDayDate}
+              onGenerateWeek={generateWeeklyPlan}
+              onRegenerateDay={regenerateDay}
+              onUpdateDay={updatePlanDay}
+            />
+          )}
 
-        {tab === "profile" && (
-          <ProfileView profile={profile} items={items} onLogout={handleLogout} />
-        )}
+          {tab === "profile" && (
+            <ProfileView profile={profile} items={items} onLogout={handleLogout} />
+          )}
         </div>
       </div>
 
@@ -319,9 +336,9 @@ export function DashboardClient() {
             setProfile((current) =>
               current
                 ? {
-                    ...current,
-                    uploadedFirstItem: true,
-                  }
+                  ...current,
+                  uploadedFirstItem: true,
+                }
                 : current
             );
           }}
@@ -331,7 +348,7 @@ export function DashboardClient() {
       <button
         type="button"
         onClick={() => setUploadOpen(true)}
-        className="fixed bottom-36 right-5 z-50 flex h-18 w-18 items-center justify-center rounded-full bg-[color:var(--accent)] text-[color:var(--primary)] shadow-[0_24px_40px_rgba(95,69,35,0.2)] transition hover:scale-105 md:bottom-32 md:right-10"
+        className="fixed bottom-24 lg:bottom-10 right-5 z-50 flex h-18 w-18 items-center justify-center rounded-full bg-accent text-primary shadow-[0_24px_40px_rgba(95,69,35,0.2)] transition hover:scale-105 md:bottom-32 md:right-10"
         aria-label="Add clothing item"
       >
         <FiPlus className="h-8 w-8" />
@@ -345,7 +362,7 @@ export function DashboardClient() {
             <div className="flex items-center justify-between gap-3">
               <div>
                 <h3 className="text-lg font-semibold text-foreground">{previewItem.name}</h3>
-                <p className="text-sm uppercase tracking-[0.18em] text-[color:var(--muted)]">
+                <p className="text-sm uppercase tracking-[0.18em] text-muted">
                   {previewItem.category}
                 </p>
               </div>
@@ -354,7 +371,7 @@ export function DashboardClient() {
                 style={{ backgroundColor: previewItem.colorHex }}
               />
             </div>
-            <div className="overflow-hidden rounded-3xl bg-[color:var(--background)]">
+            <div className="overflow-hidden rounded-3xl bg-background">
               <img
                 src={getImageUrl(previewItem)}
                 alt={previewItem.name}
@@ -368,7 +385,7 @@ export function DashboardClient() {
       <Modal open={!!deleteTarget} onClose={() => !deleting && setDeleteTarget(null)}>
         <div className="space-y-4">
           <h3 className="text-lg font-semibold text-foreground">Delete this item?</h3>
-          <p className="text-sm text-[color:var(--muted)]">
+          <p className="text-sm text-muted">
             {deleteTarget?.name} will be removed from your wardrobe.
           </p>
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
@@ -384,7 +401,7 @@ export function DashboardClient() {
               type="button"
               onClick={() => void handleDelete()}
               disabled={deleting}
-              className="rounded-full bg-gradient-to-r from-[color:var(--destructive)] to-red-600 px-5 py-3 text-sm font-medium text-white transition hover:brightness-110 disabled:opacity-60"
+              className="rounded-full to-red-600 px-5 py-3 text-sm font-medium text-white transition hover:brightness-110 disabled:opacity-60"
             >
               {deleting ? "Deleting..." : "Delete item"}
             </button>
@@ -410,7 +427,7 @@ function HeaderTab({
       onClick={onClick}
       className={[
         "px-4 py-2 text-[1rem] transition",
-        active ? "text-foreground" : "text-[color:var(--muted)] hover:text-foreground",
+        active ? "text-foreground" : "text-muted hover:text-foreground",
       ].join(" ")}
     >
       {label}

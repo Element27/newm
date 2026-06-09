@@ -10,11 +10,11 @@ const tabs: Array<{
   label: string;
   icon: React.ComponentType<{ className?: string }>;
 }> = [
-  { id: "closet", label: "Closet", icon: FiGrid },
-  { id: "planner", label: "Planner", icon: FiCalendar },
-  { id: "stylist", label: "Stylist", icon: FiZap },
-  { id: "profile", label: "Profile", icon: FiUser },
-];
+    { id: "closet", label: "Closet", icon: FiGrid },
+    { id: "planner", label: "Planner", icon: FiCalendar },
+    { id: "stylist", label: "Stylist", icon: FiZap },
+    { id: "profile", label: "Profile", icon: FiUser },
+  ];
 
 export function BottomNav({
   active,
@@ -24,8 +24,8 @@ export function BottomNav({
   onChange: (tab: DashboardTab) => void;
 }) {
   return (
-    <nav className="fixed inset-x-4 bottom-4 z-40 md:left-1/2 md:w-[42rem] md:max-w-[calc(100vw-4rem)] md:-translate-x-1/2">
-      <div className="mura-dock mx-auto flex items-center justify-between rounded-[2rem] p-3 text-[#cab189]">
+    <nav className="fixed lg:hidden inset-x-4 bottom-2 z-40 md:left-1/2 md:w-[42rem] md:max-w-[calc(100vw-4rem)] md:-translate-x-1/2">
+      <div className="mura-dock mx-auto flex items-center justify-between rounded-4xl p-2 text-[#cab189]">
         {tabs.map(({ id, label, icon: Icon }) => {
           const isActive = active === id;
           return (
@@ -34,9 +34,9 @@ export function BottomNav({
               type="button"
               onClick={() => onChange(id)}
               className={[
-                "flex min-w-0 flex-1 items-center justify-center gap-2 rounded-[1.55rem] px-3 py-4 text-sm tracking-[0.18em] uppercase transition-all duration-300",
+                "flex min-w-0 flex-1 items-center justify-center gap-2 rounded-3xl px-2 py-3 text-xs tracking-[0.18em] uppercase transition-all duration-300",
                 isActive
-                  ? "bg-[#d6b47a] text-[color:var(--primary)] shadow-[0_10px_24px_rgba(26,18,11,0.22)]"
+                  ? "bg-[#d6b47a] text-primary shadow-[0_10px_24px_rgba(26,18,11,0.22)]"
                   : "text-[#9d8767] hover:text-[#edd9ba]",
               ].join(" ")}
             >

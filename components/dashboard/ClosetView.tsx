@@ -2,7 +2,7 @@
 
 import React from "react";
 import { FiArrowRight, FiPlus } from "react-icons/fi";
-import { ClothingCard } from "./ClothingCard";
+import { OutfitCard } from "./OutfitCard";
 import type { WardrobeCategory, WardrobeItem } from "@/lib/wardrobe";
 
 const filterOptions: Array<{ label: string; value: WardrobeCategory | "all" }> = [
@@ -52,6 +52,7 @@ export function ClosetView({
   onPreview,
   onDelete,
   recommendations,
+  dailySuggestion,
   onOpenStylist,
   onAddPiece,
 }: {
@@ -62,6 +63,7 @@ export function ClosetView({
   onPreview: (item: WardrobeItem) => void;
   onDelete: (item: WardrobeItem) => void;
   recommendations: WardrobeItem[];
+  dailySuggestion: { message: string; weather: { city: string; temp: number; condition: string } | null } | null;
   onOpenStylist: () => void;
   onAddPiece: () => void;
 }) {
@@ -89,8 +91,13 @@ export function ClosetView({
             <span className="mt-3 h-4 w-4 shrink-0 rounded-full bg-[color:var(--accent)]" />
             <div className="space-y-1">
               <p className="mura-label !text-[color:#9d8465]">Stylist AI</p>
+              {dailySuggestion?.weather && (
+                <p className="text-xs uppercase tracking-[0.18em] text-[color:#9d8465]">
+                  {dailySuggestion.weather.temp}°C · {dailySuggestion.weather.city}
+                </p>
+              )}
               <p className="text-xl leading-tight text-[#f7f0e6] md:text-[1.45rem]">
-                It&apos;s a warm Thursday. You&apos;d look great in the linen blazer today.
+                {dailySuggestion?.message || "Loading suggestion..."}
               </p>
             </div>
           </div>
@@ -128,14 +135,15 @@ export function ClosetView({
       <div className="space-y-6">
         <p className="mura-label">All pieces</p>
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-          {displayedPieces.map((item, index) => (
-            <ClothingCard
+          {displayedPieces.map((item) => (
+            <OutfitCard
               key={item.id}
               item={item}
               imageUrl={getImageUrl(item)}
               onPreview={onPreview}
               onDelete={onDelete}
-              tone={index % 2 === 0 ? "sand" : "stone"}
+              showActions
+              aspectRatio="3/4"
             />
           ))}
 
